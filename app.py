@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import pandas as pd
 import numpy as np
 import joblib
@@ -54,16 +54,19 @@ def show_prediction():
 @app.route('/explain/<int:customer_id>', methods=['GET'])
 def explain(customer_id):
     try:
-        # Générer l'image SHAP et récupérer le chemin de l'image
+        customer_data_raw = extract_features_from_custom(df, customer_id)
         plot_path = generate_shap_image(customer_data_raw)
         
-        # Retourner le chemin de l'image pour Streamlit
-        return jsonify({"image_url": plot_path})
-    
+        # Retourner le chemin complet de l'image
+        return jsonify({"image_url": f"{request.host_url}static/images/{plot_path}"})
     except Exception as e:
         print("Erreur dans la route explain:", str(e))
         return jsonify({"error": "Une erreur s'est produite lors de la génération de l'explication."}), 500
 
+# Route pour servir l'image
+@app.route('/static/images/<path:filename>')
+def serve_image(filename):
+    return send_from_directory("static/images", filename)
 
 @app.route('/distributions/<int:customer_id>', methods=['GET'])
 def distributions(customer_id):
