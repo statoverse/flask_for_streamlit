@@ -58,13 +58,18 @@ def predict_score(customer_data):
 
 
 
-def generate_shap_image(customer_data_raw, max_display = 5 ):
-        
+import joblib
+import shap
+import matplotlib.pyplot as plt
+import pandas as pd
+import io
+
+def generate_shap_image(customer_data_raw, max_display=5):
     import joblib
     import shap
     import matplotlib.pyplot as plt
     import pandas as pd
-    
+    import io
     # Chemins pour le pipeline et l'explainer
     process_path = 'score/preprocessor.joblib'
     explainer_path = 'score/local_importance.joblib'
@@ -80,14 +85,18 @@ def generate_shap_image(customer_data_raw, max_display = 5 ):
     # Calculer les valeurs SHAP
     shap_values = explainer(df_predict)
     
-    # Générer et enregistrer le graphique SHAP
+    # Générer le graphique SHAP
     plt.figure()
     shap.waterfall_plot(shap_values[0], max_display=max_display, show=False)
-    plot_path = 'static/shap_global_importance.png'
-    plt.savefig(plot_path)
+    
+    # Enregistrer dans un buffer en mémoire
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
     plt.close()
+    buf.seek(0)
 
-    return plot_path
+    # Retourner le buffer de l'image encodée en base64
+    return buf
 
 
 # Nouvelle fonction pour générer une grille de distributions
