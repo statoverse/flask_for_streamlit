@@ -4,7 +4,7 @@ import numpy as np
 import joblib
 import os
 import pickle
-from functions.functions import load_data, extract_features_from_custom, predict_score, generate_shap_image
+from functions.functions import load_data, extract_features_from_custom, predict_score, generate_shap_image, generate_feature_distributions
 
 # Charger les données
 df, customer_ids = load_data()
