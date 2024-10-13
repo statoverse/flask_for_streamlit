@@ -53,21 +53,25 @@ def show_prediction():
         "customer_id": customer_id
     })
 
+
 @app.route('/explain/<int:customer_id>', methods=['GET'])
 def explain(customer_id):
     try:
         # Extraire les données du client
         customer_data_raw = extract_features_from_custom(df, customer_id)
         
-        # Générer le graphique SHAP et l'enregistrer dans un buffer mémoire
+        # Récupérer le paramètre max_display
+        max_display = int(request.args.get("max_display", 5))  # Valeur par défaut de 5 si non définie
+        
+        # Générer le graphique SHAP en utilisant max_display
         fig, ax = plt.subplots(figsize=(27, 10))
-        generate_shap_image(customer_data_raw, ax)  # Remplacez par votre fonction de génération SHAP
+        generate_shap_image(customer_data_raw, max_display=max_display)  # Passer max_display ici
         plt.tight_layout()
         
         # Sauvegarder l'image dans un buffer en mémoire
         buf = io.BytesIO()
         fig.savefig(buf, format="png")
-        plt.close(fig)  # Ferme la figure pour libérer de la mémoire
+        plt.close(fig)
         buf.seek(0)
         
         # Encoder l'image en base64
@@ -81,6 +85,7 @@ def explain(customer_id):
     except Exception as e:
         print("Erreur dans la route explain:", str(e))
         return Response("<p>Une erreur s'est produite lors de la génération de l'explication.</p>", mimetype='text/html', status=500)
+
 
 @app.route('/distributions/<int:customer_id>', methods=['GET'])
 def distributions(customer_id):

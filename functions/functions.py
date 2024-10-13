@@ -58,7 +58,7 @@ def predict_score(customer_data):
 
 
 
-def generate_shap_image(customer_data_raw):
+def generate_shap_image(customer_data_raw, max_display = 5 ):
         
     import joblib
     import shap
@@ -82,7 +82,7 @@ def generate_shap_image(customer_data_raw):
     
     # Générer et enregistrer le graphique SHAP
     plt.figure()
-    shap.waterfall_plot(shap_values[0], show=False)
+    shap.waterfall_plot(shap_values[0], max_display=max_display, show=False)
     plot_path = 'static/shap_global_importance.png'
     plt.savefig(plot_path)
     plt.close()
