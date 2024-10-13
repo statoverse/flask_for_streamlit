@@ -54,19 +54,30 @@ def show_prediction():
 @app.route('/explain/<int:customer_id>', methods=['GET'])
 def explain(customer_id):
     try:
-        # Extraire les données du client
-        customer_data_raw = extract_features_from_custom(df, customer_id)
-        print("Extraction des données du client réussie")
-        
         # Générer l'image SHAP et récupérer le chemin de l'image
         plot_path = generate_shap_image(customer_data_raw)
         
-        # Retourner le chemin de l'image sous forme de JSON pour affichage dans Streamlit
+        # Retourner le chemin de l'image pour Streamlit
         return jsonify({"image_url": plot_path})
     
     except Exception as e:
         print("Erreur dans la route explain:", str(e))
         return jsonify({"error": "Une erreur s'est produite lors de la génération de l'explication."}), 500
+
+
+@app.route('/distributions/<int:customer_id>', methods=['GET'])
+def distributions(customer_id):
+    import json
+    import plotly
+    try:
+        fig = generate_feature_distributions(df, customer_id)
+        fig_json = json.loads(plotly.io.to_json(fig))
+        return jsonify(fig_json)
+    except Exception as e:
+        print("Erreur dans la génération des distributions:", str(e))
+        return jsonify({"error": "Une erreur s'est produite"}), 500
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
