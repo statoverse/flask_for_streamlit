@@ -59,8 +59,7 @@ def explain(customer_id):
         
         # Générer le graphique SHAP et l'enregistrer dans un buffer mémoire
         fig, ax = plt.subplots(figsize=(27, 10))
-        # Supposons que generate_shap_image renvoie une figure matplotlib
-        generate_shap_image(customer_data_raw, ax)  # Remplacez avec votre logique
+        generate_shap_image(customer_data_raw, ax)  # Remplacez par votre fonction de génération SHAP
         plt.tight_layout()
         
         # Sauvegarder l'image dans un buffer en mémoire
@@ -72,12 +71,14 @@ def explain(customer_id):
         # Encoder l'image en base64
         image_base64 = base64.b64encode(buf.getbuffer()).decode("ascii")
         
-        # Retourner l'image encodée dans une réponse JSON
-        return jsonify({"image_base64": image_base64})
+        # Créer la balise HTML pour l'image
+        image_html = f"<img src='data:image/png;base64,{image_base64}' style='max-width:100%; height:auto;'/>"
+        
+        # Retourner la balise HTML directement
+        return Response(image_html, mimetype='text/html')
     except Exception as e:
         print("Erreur dans la route explain:", str(e))
-        return jsonify({"error": "Une erreur s'est produite lors de la génération de l'explication."}), 500
-
+        return Response("<p>Une erreur s'est produite lors de la génération de l'explication.</p>", mimetype='text/html', status=500)
 
 @app.route('/distributions/<int:customer_id>', methods=['GET'])
 def distributions(customer_id):
